@@ -18,9 +18,10 @@
 
 <div id="posts"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-<script>
-  const supabase = window.supabase.createClient(
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+  const supabase = createClient(
     "https://wzcwmavhypviejordoq.supabase.co",
     "sb_publishable_Bgul_mpGk0KvysByPVusTw_nee2s4qa"
   );
@@ -35,18 +36,25 @@
       return;
     }
 
-    await supabase.from("posts").insert([
+    const { error } = await supabase.from("posts").insert([
       { nickname, title, content }
     ]);
+
+    if (error) {
+      console.error(error);
+      alert("Error occurred");
+    }
 
     loadPosts();
   }
 
   async function loadPosts() {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("posts")
       .select("*")
       .order("created_at", { ascending: false });
+
+    if (error) console.error(error);
 
     const container = document.getElementById("posts");
     container.innerHTML = "";
@@ -65,7 +73,7 @@
   }
 
   loadPosts();
+  window.uploadPost = uploadPost;
 </script>
-
 </body>
 </html>
